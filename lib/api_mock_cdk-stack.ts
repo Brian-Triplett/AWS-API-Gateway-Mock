@@ -16,61 +16,40 @@ export class ApiMockCdkStack extends Stack {
     demoRestApi.root.addResource("mock").addMethod(
       "GET",
       new MockIntegration({
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+        requestTemplates: {
+          "application/json": `
+          {
+            #if( $input.params('orgId') == 999)
+              "statusCode": 404,
+            #else
+              "statusCode": 200,
+            #end
+          }`,
+        },
         integrationResponses: [
           {
             statusCode: "200",
             responseTemplates: {
               "application/json": `
-              #set($allParams = $input.params())
               {
-              "is-cool": true,
-              "body-json" : $input.json('$'),
-              "params" : {
-              #foreach($type in $allParams.keySet())
-                  #set($params = $allParams.get($type))
-              "$type" : {
-                  #foreach($paramName in $params.keySet())
-                  "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
-                      #if($foreach.hasNext),#end
-                  #end
-              }
-                  #if($foreach.hasNext),#end
-              #end
-              },
-              "stage-variables" : {
-              #foreach($key in $stageVariables.keySet())
-              "$key" : "$util.escapeJavaScript($stageVariables.get($key))"
-                  #if($foreach.hasNext),#end
-              #end
-              },
-              "context" : {
-                  "account-id" : "$context.identity.accountId",
-                  "api-id" : "$context.apiId",
-                  "api-key" : "$context.identity.apiKey",
-                  "authorizer-principal-id" : "$context.authorizer.principalId",
-                  "caller" : "$context.identity.caller",
-                  "cognito-authentication-provider" : "$context.identity.cognitoAuthenticationProvider",
-                  "cognito-authentication-type" : "$context.identity.cognitoAuthenticationType",
-                  "cognito-identity-id" : "$context.identity.cognitoIdentityId",
-                  "cognito-identity-pool-id" : "$context.identity.cognitoIdentityPoolId",
-                  "http-method" : "$context.httpMethod",
-                  "stage" : "$context.stage",
-                  "source-ip" : "$context.identity.sourceIp",
-                  "user" : "$context.identity.user",
-                  "user-agent" : "$context.identity.userAgent",
-                  "user-arn" : "$context.identity.userArn",
-                  "request-id" : "$context.requestId",
-                  "resource-id" : "$context.resourceId",
-                  "resource-path" : "$context.resourcePath"
-                  }
+                "capability": "LLC_BI",
+                "id": $input.params('orgId'),
+                "status": "available"
+              }`,
+            },
+          },
+          {
+            statusCode: "404",
+            selectionPattern: "404",
+            responseTemplates: {
+              "application/json": `
+              {
+                "message": "Org Id $input.params('orgId') not found"
               }`,
             },
           },
         ],
-        passthroughBehavior: PassthroughBehavior.NEVER,
-        requestTemplates: {
-          "application/json": '{"statusCode": 200}',
-        },
       }),
       {
         methodResponses: [
@@ -78,6 +57,12 @@ export class ApiMockCdkStack extends Stack {
             statusCode: "200",
             responseModels: {
               "application/json": Model.EMPTY_MODEL,
+            },
+          },
+          {
+            statusCode: "404",
+            responseModels: {
+              "application/json": Model.ERROR_MODEL,
             },
           },
         ],
