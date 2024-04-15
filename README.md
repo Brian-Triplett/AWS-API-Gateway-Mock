@@ -1,6 +1,6 @@
 # Mocking AWS API Gatway with MockIntegration
 
-This repo contains an example of using MockIntegraiton to setup a mocked REST endpoint for AWS API Gateway. This article draws heavily from the following article: https://dev.to/dvddpl/mock-a-restful-api-with-aws-apigateway-and-mockintegration-584n. 
+This repo contains an example of using [MockIntegraiton](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_apigateway.MockIntegration.html) to setup a mocked REST endpoint for AWS API Gateway. This article draws heavily from the following article: https://dev.to/dvddpl/mock-a-restful-api-with-aws-apigateway-and-mockintegration-584n. 
 
 This app also uses the `cdk init` command to scaffold the structure of this app.
 
